@@ -22,6 +22,18 @@ Constraints:
 - All configured inference profile ARNs must use same Bedrock region.
 - Runtime endpoint is derived from configured inference profile ARN region, not hardcoded.
 
+## Prerequisite: AWS credentials
+
+The underlying AWS SDK client also needs standard AWS region/credential resolution to
+succeed independently of the ARN-derived endpoint above (`~/.aws/config`, `~/.aws/credentials`,
+or `AWS_PROFILE`/`AWS_ACCESS_KEY_ID`+`AWS_SECRET_ACCESS_KEY`). Without a resolvable region the
+SDK throws `Region is missing` even when an inference profile ARN is configured. Set:
+
+```bash
+export AWS_DEFAULT_REGION=us-east-1  # or your inference profile's region
+export AWS_REGION=us-east-1
+```
+
 ## Thinking config
 
 Use `/bedrock-inference-profile-config` to configure thinking for active Bedrock inference profile model.
