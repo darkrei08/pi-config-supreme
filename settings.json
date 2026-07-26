@@ -1,5 +1,5 @@
 {
-  "lastChangelogVersion": "0.81.1",
+  "lastChangelogVersion": "0.82.1",
   "defaultProvider": "openai-codex",
   "defaultModel": "gpt-5.6-sol",
   "defaultThinkingLevel": "high",
@@ -27,7 +27,8 @@
     "git:github.com/vekexasia/pi-notify@feat/customizable-notifications",
     "npm:@sting8k/pi-vcc",
     "npm:pi-orcarouter",
-    "npm:@plannotator/pi-extension"
+    "npm:@plannotator/pi-extension",
+    "npm:pi-claude-bridge"
   ],
   "skills": [
     "-skills/browser-use"

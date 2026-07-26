@@ -52,7 +52,7 @@ docs/reference/                    source READMEs kept for provenance
 
 ## Extensions included
 
-Dynamic Context Pruning (`pi-dcp`), multi-provider web fetch/search/extract (`pi-web-tools`), caveman compression, structured commits, prompt history, image attachments with kitty graphics preview, sandboxed execution, working indicator, interactive shell, reasoning display, system-prompt filtering, session indexing, Bedrock inference-profile provider, Claude Code spawning, co-authored-by trailer management, skill registry, quiet-tools, pretty output, codegraph tools, startup banner — plus vekexasia's personal set (live dashboard, HA quota, herdr agent/manual state, vim editor, fork-out, hashline bridge, learning-opportunities-auto, questionnaire, tmux progress, answer, show-system-prompt).
+Dynamic Context Pruning (`pi-dcp`), multi-provider web fetch/search/extract (`pi-web-tools`), caveman compression, structured commits, prompt history, image attachments with kitty graphics preview, sandboxed execution, working indicator, interactive shell, reasoning display, system-prompt filtering, session indexing, Claude Code spawning, co-authored-by trailer management, skill registry, quiet-tools, pretty output, codegraph tools, startup banner — plus vekexasia's personal set (live dashboard, HA quota, herdr agent/manual state, vim editor, fork-out, hashline bridge, learning-opportunities-auto, questionnaire, tmux progress, answer, show-system-prompt).
 
 ## Deliberately excluded
 
