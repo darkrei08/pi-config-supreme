@@ -1,0 +1,22 @@
+{
+  "name": "pi-images",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Image attachments with kitty graphics preview thumbnails and screenshot tool-result promotion.",
+  "license": "MIT",
+  "pi": {
+    "extensions": [
+      "./index.ts"
+    ]
+  },
+  "files": [
+    "index.ts",
+    "src",
+    "README.md"
+  ],
+  "peerDependencies": {
+    "@mariozechner/pi-ai": "*",
+    "@mariozechner/pi-coding-agent": "*",
+    "@mariozechner/pi-tui": "*"
+  }
+}

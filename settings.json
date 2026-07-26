@@ -1,0 +1,38 @@
+{
+  "lastChangelogVersion": "0.81.1",
+  "defaultProvider": "openai-codex",
+  "defaultModel": "gpt-5.6-sol",
+  "defaultThinkingLevel": "high",
+  "theme": "dark",
+  "packages": [
+    "npm:pi-web-access",
+    "git:github.com/pasky/chrome-cdp-skill@v1.0.1",
+    "npm:visual-explainer",
+    {
+      "source": "git:github.com/vekexasia/pi-high-availability",
+      "extensions": [
+        "-extensions/index.ts"
+      ]
+    },
+    "npm:pi-btw",
+    "npm:pi-anthropic-oauth",
+    "git:github.com/vekexasia/pi-codex-image@fix-codex-image-generation-output",
+    "npm:pi-vim",
+    "npm:pi-markdown-preview",
+    "npm:@tintinweb/pi-subagents",
+    "npm:@narumitw/pi-goal",
+    "git:github.com/DietrichGebert/ponytail",
+    "git:github.com/pasky/pi-omplike-advisor",
+    "npm:pi-tool-display",
+    "git:github.com/YuGiMob/pi-hashline-edit-pro",
+    "git:github.com/vekexasia/pi-notify@feat/customizable-notifications",
+    "npm:@sting8k/pi-vcc",
+    "npm:pi-orcarouter",
+    "npm:@plannotator/pi-extension"
+  ],
+  "skills": [
+    "-skills/browser-use"
+  ],
+  "hideThinkingBlock": false,
+  "showCacheMissNotices": true
+}

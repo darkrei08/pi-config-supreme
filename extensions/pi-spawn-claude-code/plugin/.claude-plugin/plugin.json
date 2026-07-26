@@ -1,0 +1,5 @@
+{
+  "name": "pi-spawn-claude-code",
+  "version": "1.0.0",
+  "description": "Stop-hook glue for Pi Spawn Claude Code tool"
+}

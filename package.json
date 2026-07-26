@@ -1,0 +1,13 @@
+{
+  "name": "pi-config-supreme",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Merged Pi coding agent configuration: vekexasia/pi-config base + PrayagS/pi-config extensions + gentle-pi lightweight tooling, wired for pi-extensible-workflows.",
+  "keywords": ["pi-package"],
+  "license": "MIT",
+  "pi": {
+    "extensions": ["extensions"],
+    "skills": ["skills"],
+    "themes": ["themes"]
+  }
+}

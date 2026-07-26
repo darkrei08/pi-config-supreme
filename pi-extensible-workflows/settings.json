@@ -1,0 +1,31 @@
+{
+  "modelAliases": {
+    "reviewer-model": "openai-codex/gpt-5.6-sol:high",
+    "scout-model": "openai-codex/gpt-5.6-luna:high",
+    "cheap-model": "scout-model",
+    "developer-model": "openai-codex/gpt-5.6-luna:xhigh"
+  },
+  "disabledAgentResources": {
+    "skills": [
+      "learning-opportunities",
+      "grill-me",
+      "grill-with-docs",
+      "grilling",
+      "orient",
+      "ponytail",
+      "teach",
+      "visual-explainer",
+      "ponytail-audit",
+      "ponytail-debt",
+      "ponytail-gain",
+      "ponytail-help",
+      "ponytail-review"
+    ],
+    "extensions": [
+      "~/.pi/agent/git/github.com/DietrichGebert/ponytail/pi-extension/index.js",
+      "~/.pi/agent/extensions/questionnaire.ts",
+      "~/.pi/agent/npm/node_modules/pi-markdown-preview/index.ts",
+      "~/.pi/agent/npm/node_modules/visual-explainer/plugins/visual-explainer/extension.ts"
+    ]
+  }
+}

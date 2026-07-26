@@ -1,0 +1,213 @@
+/**
+ * Tool cache — tracks all tool calls and their results
+ *
+ * Syncs from context messages on every LLM call so the LLM
+ * can reference tool calls by numeric ID for pruning/distillation.
+ */
+
+import type { AgentMessage } from "@mariozechner/pi-agent-core";
+import { countTokens, extractMessageText } from "./tokens";
+import { isMaskedByCondensedMilk } from "./cm-compat";
+import { isToolProtected } from "./protected-tools";
+import { getFilePathsFromToolCall, isFilePathProtected } from "./protected-patterns";
+
+export interface ToolCacheEntry {
+  /** Original tool call ID (e.g. toolu_01ABC) */
+  callId: string;
+  /** Tool name (read, write, edit, bash, etc.) */
+  toolName: string;
+  /** Tool parameters */
+  parameters: Record<string, any>;
+  /** Estimated token count of the result */
+  tokenCount: number;
+  /** Whether this tool produced an error */
+  isError: boolean;
+  /** Short identifier for display (e.g. file path, command) */
+  paramKey: string;
+  /** Agent turn this tool call belongs to (0-indexed) */
+  turn: number;
+  /** True if condensed-milk has already masked this result */
+  maskedByCm: boolean;
+}
+
+export interface ToolCacheState {
+  /** callId → entry */
+  cache: Map<string, ToolCacheEntry>;
+  /** Ordered list of callIds for numeric indexing */
+  idList: string[];
+  /** Set of callIds that have been pruned */
+  prunedIds: Set<string>;
+  /** callId → distillation text */
+  distillations: Map<string, string>;
+  /** Current turn counter (incremented on each user message) */
+  currentTurn: number;
+}
+
+/**
+ * Create empty tool cache state
+ */
+export function createToolCacheState(): ToolCacheState {
+  return {
+    cache: new Map(),
+    idList: [],
+    prunedIds: new Set(),
+    distillations: new Map(),
+    currentTurn: 0,
+  };
+}
+
+/**
+ * Sync tool cache from current context messages.
+ * Scans for assistant toolCall blocks and their matching toolResult messages.
+ */
+export function syncToolCache(
+  state: ToolCacheState,
+  messages: AgentMessage[],
+  protectedTools: string[] = []
+): void {
+  // Build map of callId → toolResult for quick lookup
+  const resultMap = new Map<string, AgentMessage>();
+  for (const msg of messages) {
+    if (msg.role === "toolResult" && msg.toolCallId) {
+      resultMap.set(msg.toolCallId, msg);
+    }
+  }
+
+  // Count turns (each user message starts a new turn)
+  let turnCounter = 0;
+  for (const msg of messages) {
+    if (msg.role === "user") {
+      turnCounter++;
+    }
+
+    if (msg.role !== "assistant" || !Array.isArray(msg.content)) continue;
+
+    for (const block of msg.content) {
+      if (!block || block.type !== "toolCall" || !block.id) continue;
+
+      const toolName = block.name || "unknown";
+      const parameters = block.arguments || {};
+      const result = resultMap.get(block.id);
+
+      // Re-count tokens from current content on every sync.
+      // When condensed-milk masks a result after initial cache,
+      // the stored tokenCount would be stale (original size vs
+      // ~15-token placeholder). Recounting keeps the prunable-tools
+      // list accurate so the LLM doesn't waste DCP calls on
+      // already-compressed entries.
+      const resultText = result ? extractMessageText(result) : "";
+      const masked = isMaskedByCondensedMilk(resultText);
+      const tokenCount = resultText ? countTokens(resultText) : 0;
+      const isError = result ? !!(result as any).isError : false;
+
+      if (state.cache.has(block.id)) {
+        // Update token count (may have changed due to CM masking)
+        const existing = state.cache.get(block.id)!;
+        existing.tokenCount = tokenCount;
+        existing.maskedByCm = masked;
+        continue;
+      }
+
+      const entry: ToolCacheEntry = {
+        callId: block.id,
+        toolName,
+        parameters,
+        tokenCount,
+        isError,
+        maskedByCm: masked,
+        paramKey: extractParamKey(toolName, parameters),
+        turn: turnCounter,
+      };
+
+      state.cache.set(block.id, entry);
+      state.idList.push(block.id);
+    }
+  }
+
+  state.currentTurn = turnCounter;
+}
+
+/**
+ * Extract a human-readable key from tool parameters.
+ * Used in the prunable-tools list so the LLM knows what each call did.
+ */
+export function extractParamKey(toolName: string, params: Record<string, any>): string {
+  // File operations: use path
+  if (params.path) return String(params.path);
+  if (params.file_path) return String(params.file_path);
+
+  // Bash: use command (truncated)
+  if (params.command) {
+    const cmd = String(params.command);
+    return cmd.length > 60 ? cmd.slice(0, 57) + "..." : cmd;
+  }
+
+  // Search: use pattern/query
+  if (params.pattern) return String(params.pattern);
+  if (params.query) return String(params.query);
+  if (params.regex) return String(params.regex);
+
+  // Fallback: first string param
+  for (const [, v] of Object.entries(params)) {
+    if (typeof v === "string" && v.length > 0) {
+      return v.length > 60 ? v.slice(0, 57) + "..." : v;
+    }
+  }
+
+  return toolName;
+}
+
+/**
+ * Get prunable entries (not already pruned, not protected, not too recent).
+ * Returns entries with their numeric index for the LLM.
+ *
+ * @param skipRecent Number of most recent entries to exclude from the list.
+ *   Prevents the model from pruning tool results it just received.
+ * @param turnProtection If set, entries from the last N turns are excluded.
+ *   Takes precedence over skipRecent — tools from protected turns never appear.
+ */
+export function getPrunableEntries(
+  state: ToolCacheState,
+  protectedTools: string[] = [],
+  skipRecent: number = 5,
+  turnProtection?: { enabled: boolean; turns: number },
+  protectedFilePatterns: string[] = []
+): { numericId: number; entry: ToolCacheEntry }[] {
+  const result: { numericId: number; entry: ToolCacheEntry }[] = [];
+
+  // Don't show the last N entries as prunable — they're too fresh
+  const cutoff = Math.max(0, state.idList.length - skipRecent);
+
+  for (let i = 0; i < cutoff; i++) {
+    const callId = state.idList[i];
+    if (state.prunedIds.has(callId)) continue;
+
+    const entry = state.cache.get(callId);
+    if (!entry) continue;
+    if (isToolProtected(entry.toolName, protectedTools)) continue;
+
+    // Skip entries already masked by condensed-milk — they're tiny
+    // placeholders (~15 tokens). Pruning/distilling them saves nothing
+    // and produces garbage distillations of placeholder text.
+    if (entry.maskedByCm) continue;
+
+    // File-path protection: skip entries whose file paths match protected patterns
+    if (protectedFilePatterns.length > 0) {
+      const filePaths = getFilePathsFromToolCall(entry.toolName, entry.parameters);
+      if (isFilePathProtected(filePaths, protectedFilePatterns)) continue;
+    }
+
+    // Turn protection: skip entries from the last N agent turns
+    if (
+      turnProtection?.enabled &&
+      turnProtection.turns > 0 &&
+      state.currentTurn - entry.turn < turnProtection.turns
+    ) {
+      continue;
+    }
+
+    result.push({ numericId: i, entry });
+  }
+
+  return result;
+}
