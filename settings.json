@@ -28,7 +28,8 @@
     "npm:@sting8k/pi-vcc",
     "npm:pi-orcarouter",
     "npm:@plannotator/pi-extension",
-    "npm:pi-claude-bridge"
+    "npm:pi-claude-bridge",
+    "npm:pi-extensible-workflows"
   ],
   "skills": [
     "-skills/browser-use"
