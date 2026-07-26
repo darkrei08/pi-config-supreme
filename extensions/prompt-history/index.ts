@@ -389,21 +389,21 @@ export default function (pi: ExtensionAPI) {
 		prewarmPromptCache();
 	});
 
-	pi.registerShortcut("ctrl+k", {
+	pi.registerShortcut("alt+k", {
 		description: "Recall older prompt from all Pi sessions",
 		handler: async (ctx) => {
 			await recallPrompt(ctx, "previous");
 		},
 	});
 
-	pi.registerShortcut("ctrl+j", {
+	pi.registerShortcut("alt+j", {
 		description: "Recall newer prompt from all Pi sessions",
 		handler: async (ctx) => {
 			await recallPrompt(ctx, "next");
 		},
 	});
 
-	pi.registerShortcut("ctrl+r", {
+	pi.registerShortcut("alt+r", {
 		description: "Search prompt history from all Pi sessions",
 		handler: async (ctx) => {
 			await searchPrompts(ctx);
