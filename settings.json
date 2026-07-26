@@ -5,7 +5,6 @@
   "defaultThinkingLevel": "high",
   "theme": "dark",
   "packages": [
-    "npm:pi-web-access",
     "git:github.com/pasky/chrome-cdp-skill@v1.0.1",
     "npm:visual-explainer",
     {
