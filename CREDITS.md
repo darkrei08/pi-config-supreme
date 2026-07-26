@@ -9,7 +9,7 @@ This configuration is a merge of three MIT-licensed Pi configs plus the `pi-exte
 The plugin this configuration is wired for. Not vendored here; installed as a package per `settings.json`.
 
 ## [PrayagS/pi-config](https://github.com/PrayagS/pi-config) — MIT, Copyright (c) 2026 Prayag Savsani
-Core philosophy section of `AGENTS.md`, and extensions: `pi-dcp` (Dynamic Context Pruning — originally ported from opencode-dcp by Edmund Miller), `pi-web-tools`, `caveman`, `commit`, `prompt-history`, `pi-images`, `pi-better-prompt-editor`, `sandbox`, `working-indicator`, `interactive-shell`, `reasoning`, `zzz-system-prompt-filter`, `qmd-sessions-indexer`, `custom-provider-bedrock-inference-profiles`, `pi-spawn-claude-code`, `pi-co-authored-by`, `tools`. Skills: `skill-creator`, `vcs`, `yaml-reader`. Ghostty themes.
+Core philosophy section of `AGENTS.md`, and extensions: `pi-dcp` (Dynamic Context Pruning — originally ported from opencode-dcp by Edmund Miller), `pi-web-tools`, `caveman`, `commit`, `prompt-history`, `pi-images`, `pi-better-prompt-editor`, `sandbox`, `working-indicator`, `interactive-shell`, `reasoning`, `zzz-system-prompt-filter`, `qmd-sessions-indexer`, `pi-spawn-claude-code`, `pi-co-authored-by`, `tools`. Skills: `skill-creator`, `vcs`, `yaml-reader`. Ghostty themes.
 
 ## [Gentleman-Programming/gentle-pi](https://github.com/Gentleman-Programming/gentle-pi) — MIT, Copyright (c) 2025 Mario Zechner
 Lightweight standalone extensions: `skill-registry`, `quiet-tools`, `pi-pretty`, `codegraph-tools`, `startup-banner`. Optional 4R adversarial review roles (`readability`, `refuter`, `reliability`, `resilience`, `risk`, `validator`) ported to `pi-extensible-workflows/roles-optional-4r-review/` as static role definitions.
